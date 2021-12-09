@@ -1,7 +1,7 @@
 # ContextMap
 
-Knowledge sharing and collaboration in an event-driven architecture, with polyglot microservices and self organizing teams doing devops... it's a challenge.
-Contextmap scans your code, generates documentation and visualizes it in a centralized dashboard: accurate, zero-effort and always up to date documentation
+Knowledge sharing and collaboration in an event-driven architecture, with polyglot microservices and self-organizing teams doing devops... it's a challenge.
+Contextmap scans your code, generates documentation and visualizes it in a centralized developer portal: accurate, zero-effort and always up to date documentation
 
 
 ## Getting started
@@ -30,7 +30,7 @@ The command to run the compile-time scan is "`mvn contextmap:scan`"
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.1.0</version>
+      <version>1.3.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -46,25 +46,27 @@ The command to run the compile-time scan is "`mvn contextmap:scan`"
 
 To configure the runtime scanning of your project, add the following dependency to your pom.xml file.
 The runtime scan will only happen once at startup of your project.
+
 ```xml
 <dependencies>
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.1.0</version>
+    <version>1.3.0</version>
   </dependency>
 </dependencies>
 ```
 
 By default the scan at startup is disabled. To enable it and to define the necessary key, add the following
 to your configuration file (for instance the application.properties file)
+
 ```properties
 contextmap.key=PLACE_KEY_HERE
 contextmap.enabled=true
 ```
 
 > ✔️ If you have multiple environments, such as development, test, production, etc. then you want to make
-> sure to only configure the runtime scan on one environment. This way you will have a consistent view 
+> sure to only configure the runtime scan on one environment. This way you will have a consistent view
 > of a single environment.
 
 ##### Custom annotations
@@ -79,7 +81,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.1.0</version>
+    <version>1.3.0</version>
   </dependency>
 </dependencies>
 ```
@@ -92,27 +94,30 @@ We do recommend to limit the use of custom annotations to only those cases where
 #### Java
 
 ##### Properties
+
 The properties are scanned at compile-time.
-The overview of a component contains the following details: 
-- **System name** is based on the property contextmap.scan.system-name in your properties files, 
+The overview of a component contains the following details:
+
+- **System name** is based on the property contextmap.scan.system-name in your .properties file or .yml file,
   if not available then it falls back to the &lt;groupId /&gt; in the pom.xml
-- **Component name** is based on the property spring.application.name in your properties files, 
+- **Component name** is based on the property spring.application.name in your .properties file or .yml file,
   if not available then it falls back to the &lt;name /&gt; in the pom.xml
-- **Domain vision statement** is based on the &lt;description /&gt; in the pom.xml  
-- **Technology** is based on the &lt;dependencies /&gt; in the pom.xml  
+- **Domain vision statement** is based on the &lt;description /&gt; in the pom.xml
+- **Technology** is based on the &lt;dependencies /&gt; in the pom.xml
 - **Team** is based on the first &lt;developer /&gt; in the pom.xml
 - **Bytes of code** is determined by scanning the files in your source folder, counting the filesizes
-- **Languages** are determined by scanning the files in your source folder, and looking at the filenames 
-- **Version** is based on the &lt;version /&gt; in the pom.xml  
+- **Languages** are determined by scanning the files in your source folder, and looking at the filenames
+- **Version** is based on the &lt;version /&gt; in the pom.xml
 - **Url issue management** is based on the url from &lt;issueManagement&gt;&lt;url /&gt;&lt;/issueManagement&gt; in the pom.xml
 - **Url source code** is based on the url from &lt;scm&gt;&lt;url /&gt;&lt;/scm&gt; in the pom.xml
 - **Url for external documentation** is based on the &lt;url /&gt; in the pom.xml
 - **Url buid pipeline** is based on the url from &lt;ciManagement&gt;&lt;url /&gt;&lt;/ciManagement&gt; in the pom.xml
-- **Component type** is based on the property contextmap.scan.component-type in your properties file,
-  its value can be `MICROSERVICE`, `MICROFRONTEND` or `GATEWAY`, 
+- **Component type** is based on the property contextmap.scan.component-type in your .properties file or .yml file,
+  its value can be `MICROSERVICE`, `MICROFRONTEND` or `GATEWAY`,
   if not available then it falls back to the default value `MICROSERVICE`
 
 ##### Domain Entities
+
 Domain entities are scanned at compile-time based on any of the following annotations:
 
 - @Entity (javax.persistence.Entity)
@@ -154,23 +159,27 @@ public class Order {
 }
 ```
 
-##### Published REST API 
+##### Published REST API
+
 The published REST API is scanned at compile-time.
 The following annotations will identify a class as a published REST API:
+
 - @RestController (org.springframework.web.bind.annotation.RestController)
 - @Controller (org.springframework.stereotype.Controller)
 
 Any method included in such a class with one of the following annotations, is seen as a published endpoint
+
 - @GetMapping (org.springframework.web.bind.annotation.GetMapping)
 - @PostMappping (org.springframework.web.bind.annotation.PostMapping)
 - @PutMapping (org.springframework.web.bind.annotation.PutMapping)
 - @DeleteMapping (org.springframework.web.bind.annotation.DeleteMapping)
 - @PatchMapping (org.springframework.web.bind.annotation.PatchMapping)
-- @RequestMapping (org.springframework.web.bind.annotation.RequestMapping)  
+- @RequestMapping (org.springframework.web.bind.annotation.RequestMapping)
 
-The custom annotation `ContextApiProperty` can be used customize the documentation of a property.
+The custom annotation `@ContextApiProperty` can be used to customize the documentation of a property.
 
 For example:
+
 ```java
 public class OrderDto {
   ...
@@ -179,83 +188,116 @@ public class OrderDto {
   ...
 }
 ```
+
 > By default the name of a property's class is used as its datatype.
-> Also by defaul, all possible values of an enum property are included as example.
+> Also by default, all possible values of an enum property are included as example.
 
 ##### Subscribed REST API
+
 The subscribed REST API is scanned at compile-time.
 The synchronous links between components in contextmap are based on the subscribed REST APIs.
 The following annotation will identify a class as a subscribed REST API, and as such
 create a link between the components:
+
 - @FeignClient (org.springframework.cloud.openfeign.FeignClient)
 
 ##### Events
+
 Events are scanned at runtime.
 The asynchronous links between components in contextmap are based on the events.
 Contextmap currently supports scanning the following eventing solutions
+
 - RabbitMQ
+- ActiveMQ (JMS)
 
 ###### RabbitMQ
 
-Exchanges on which the scanned component publishes messages are scanned by finding Spring beans of type 
+Exchanges on which the scanned component publishes messages are scanned by finding Spring beans of type
+
 - Exchange (org.springframework.amqp.core.Exchange)
 - RabbitTemplate (org.springframework.amqp.rabbit.core.RabbitTemplate)
-
 
 Queues on which the scanned component subscribes are scanned by finding Spring beans of type
 Binding (org.springframework.amqp.core.Binding)
 
+###### ActiveMQ (JMS)
+
+Queues/Topics on which the scanned component publishes messages are scanned by finding Spring beans of type
+
+- Queue (javax.jms.Queue)
+- Topic (javax.jms.Topic)
+
+Queues/Topics on which the scanned component subscribes are scanned by finding beans with methods
+annotated with @JmsListener (org.springframework.jms.annotation.JmsListener)
+
 ###### Event Payload
-Use the custom annotation `ContextEvent` to allow contextmap to identify the payload
+
+Use the custom annotation `@ContextEvent` to allow contextmap to identify the payload
 (or potentially multiple payloads) of an event which is published.
 For example:
+
 ```java
 @ContextEvent(publishedBy = "orderCreatedExchange")
 public class OrderCreated {
   ...
 }
 ```
-The `publishedBy` attribute refers to the Spring bean's name on which is published.
-This can be either a Exchange or a RabbitTemplate.
+
+The `publishedBy` attribute refers to either the SpringBean's name on which is published, or
+the actual name itself.
 
 ##### Storages
+
 Storages are scanned at runtime.
 Contextmap currently supports scanning the following types of storages:
-- **jdbc databases** are scanned by finding Spring beans of type DataSource 
+
+- **jdbc databases** are scanned by finding Spring beans of type DataSource
   (javax.sql.DataSource)
-- **MongoDB** are scanned by finding Spring beans of type MongoTemplate 
-  (org.springframework.data.mongodb.core.MongoTemplate)  
+- **MongoDB** are scanned by finding Spring beans of type MongoTemplate
+  (org.springframework.data.mongodb.core.MongoTemplate)
 - **Solr** is scanned by finding Spring beans of type SolrTemplate
-  (org.springframework.data.solr.core.SolrTemplate)  
+  (org.springframework.data.solr.core.SolrTemplate)
 - **Caches** are scanned by getting the caches from Spring's CacheManager
   (org.springframework.cache.CacheManager)
-    
 
 ##### Decision records
+
 Decision records and other markdown files are scanned at compile-time.
 This is done by looking at the source folder and checking the file-extension.
 Each file with extension `.md`, `.ad` or `.adr` will be included.
 
+Unmodified files will be ignored. If you modify a file which was previously scanned, then
+the next time it is scanned it will be updated.
 
-Unmodified files will be ignored. If you modify a file which was previously scanned, then 
+##### Features
+
+Features are scanned at compile-time.
+This is done by looking at the source folder and checking the file-extension.
+Each file with extension `.feature`, or `.story` will be included.
+
+Unmodified files will be ignored. If you modify a file which was previously scanned, then
 the next time it is scanned it will be updated.
 
 ##### Releases
+
 Releases are scanned at compile-time.
 All local tags in Git will be included. The commits associated with each tag are also included.
-Only the date and the message of a commit is tracked. 
+Only the date and the message of a commit is tracked.
 Other information (such as the person who made the commit) is not tracked.
 
 ##### Recent Commits
-Recent commits are scanned at compile-time. 
+
+Recent commits are scanned at compile-time.
 All commits in Git from the last 90 days will be included.
-Only the date and the message of a commit is tracked. 
+Only the date and the message of a commit is tracked.
 Other information (such as the person who made the commit) is not tracked.
 
 ##### Glossary
 
+The glossary terms are scanned at compile-time.
 Use the custom annotation @ContextGlossary to scan for terms to include in your glossary.
 For example:
+
 ```java
 @ContextGlossary("A request to make, supply, or deliver food or goods")
 public class Order {
