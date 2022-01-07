@@ -30,7 +30,7 @@ The command to run the compile-time scan is "`mvn contextmap:scan`"
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.3.0</version>
+      <version>1.4.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -42,6 +42,27 @@ The command to run the compile-time scan is "`mvn contextmap:scan`"
 > ✔️ We highly recommend to modify your CI/CD pipeline to include the contextmap scan.
 > This way your documentation will be automatically kept up to date.
 
+For multi-module maven projects, the plugin needs to be added to the root's pom.xml file. That way all
+child-modules will be scanned. In this case an additional configuration property is needed to ensure all modules
+are linked to the same component.   
+The configuration will look like this:
+```xml
+<build>
+  <plugins>
+    <plugin>
+      <groupId>io.contextmap</groupId>
+      <artifactId>java-spring-compiletime</artifactId>
+      <version>1.4.0</version>
+      <configuration>
+        <key>PLACE_KEY_HERE</key>
+        <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+```
+
+
 ##### Runtime scan
 
 To configure the runtime scanning of your project, add the following dependency to your pom.xml file.
@@ -52,7 +73,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
   </dependency>
 </dependencies>
 ```
@@ -69,6 +90,17 @@ contextmap.enabled=true
 > sure to only configure the runtime scan on one environment. This way you will have a consistent view
 > of a single environment.
 
+For multi-module maven projects, the dependency needs to be added in the module which is used to run the project.
+(i.e. which contains the executed main method).
+An additional property is required to indicate that the runtime scan needs to be added to a multi-module project.   
+The configuration will look like this:
+```properties
+contextmap.key=PLACE_KEY_HERE
+contextmap.enabled=true
+contextmap.scan.multi-module-component-name=COMPONENT_NAME
+```
+
+
 ##### Custom annotations
 
 Your code already contains lots of knowledge and information, which contextmap scans as-is.
@@ -81,7 +113,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
   </dependency>
 </dependencies>
 ```
@@ -196,10 +228,11 @@ public class OrderDto {
 
 The subscribed REST API is scanned at compile-time.
 The synchronous links between components in contextmap are based on the subscribed REST APIs.
-The following annotation will identify a class as a subscribed REST API, and as such
+The following annotations will identify a class as a subscribed REST API, and as such
 create a link between the components:
 
 - @FeignClient (org.springframework.cloud.openfeign.FeignClient)
+- @FeignClient (org.springframework.cloud.netflix.feign.FeignClient)
 
 ##### Events
 
@@ -237,14 +270,24 @@ Use the custom annotation `@ContextEvent` to allow contextmap to identify the pa
 For example:
 
 ```java
+// For RabbitMQ you can refer to the name of an Exchange or RabbitTemplate registered as Spring Bean
 @ContextEvent(publishedBy = "orderCreatedExchange")
 public class OrderCreated {
   ...
 }
-```
 
-The `publishedBy` attribute refers to either the SpringBean's name on which is published, or
-the actual name itself.
+// For ActiveMQ you can refer to the name of a Queue or Topic registered as Spring Bean
+@ContextEvent(publishedBy = "orderCreatedTopic")
+public class OrderCreated {
+  ...
+}
+
+// Or you could refer to a configuration property for the target name on which is published
+@ContextEvent(publishedBy = "${order-created.exchange}")
+public class OrderCreated {
+  ...
+}
+```
 
 ##### Storages
 
