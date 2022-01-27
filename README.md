@@ -22,7 +22,8 @@ Therefor to run a complete scan of the code you should configure both the compil
 To configure compile-time scanning of your project, add the following plugin
 to your pom.xml file. Afterwards you can run the compile-time scan either manually, and/or configure
 your CI/CD pipeline to run the scan.
-The command to run the compile-time scan is "`mvn contextmap:scan`"
+The command to run the compile-time scan is "`mvn contextmap:scan`".
+Make sure to run this command with the root directory of your project as current directory.
 
 ```xml
 <build>
@@ -30,7 +31,7 @@ The command to run the compile-time scan is "`mvn contextmap:scan`"
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.4.0</version>
+      <version>1.5.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -44,15 +45,16 @@ The command to run the compile-time scan is "`mvn contextmap:scan`"
 
 For multi-module maven projects, the plugin needs to be added to the root's pom.xml file. That way all
 child-modules will be scanned. In this case an additional configuration property is needed to ensure all modules
-are linked to the same component.   
+are linked to the same component.  
 The configuration will look like this:
+
 ```xml
 <build>
   <plugins>
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.4.0</version>
+      <version>1.5.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -61,7 +63,6 @@ The configuration will look like this:
   </plugins>
 </build>
 ```
-
 
 ##### Runtime scan
 
@@ -73,7 +74,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
   </dependency>
 </dependencies>
 ```
@@ -92,14 +93,14 @@ contextmap.enabled=true
 
 For multi-module maven projects, the dependency needs to be added in the module which is used to run the project.
 (i.e. which contains the executed main method).
-An additional property is required to indicate that the runtime scan needs to be added to a multi-module project.   
+An additional property is required to indicate that the runtime scan needs to be added to a multi-module project.  
 The configuration will look like this:
+
 ```properties
 contextmap.key=PLACE_KEY_HERE
 contextmap.enabled=true
 contextmap.scan.multi-module-component-name=COMPONENT_NAME
 ```
-
 
 ##### Custom annotations
 
@@ -113,7 +114,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
   </dependency>
 </dependencies>
 ```
@@ -294,14 +295,16 @@ public class OrderCreated {
 Storages are scanned at runtime.
 Contextmap currently supports scanning the following types of storages:
 
-- **jdbc databases** are scanned by finding Spring beans of type DataSource
-  (javax.sql.DataSource)
+- **JDBC databases** are scanned by finding Spring beans of type DataSource
+  (javax.sql.DataSource).   
+  Tables and views for the current schema/catalog of the database are included in the scan.
 - **MongoDB** are scanned by finding Spring beans of type MongoTemplate
   (org.springframework.data.mongodb.core.MongoTemplate)
 - **Solr** is scanned by finding Spring beans of type SolrTemplate
   (org.springframework.data.solr.core.SolrTemplate)
 - **Caches** are scanned by getting the caches from Spring's CacheManager
   (org.springframework.cache.CacheManager)
+ 
 
 ##### Decision records
 
