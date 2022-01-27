@@ -31,7 +31,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.5.0</version>
+      <version>1.6.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -43,8 +43,8 @@ Make sure to run this command with the root directory of your project as current
 > ✔️ We highly recommend to modify your CI/CD pipeline to include the contextmap scan.
 > This way your documentation will be automatically kept up to date.
 
-For multi-module maven projects, the plugin needs to be added to the root's pom.xml file. That way all
-child-modules will be scanned. In this case an additional configuration property is needed to ensure all modules
+For multi-module maven projects, the plugin needs to be added only to the root's pom.xml file. That way all
+child-modules will also be scanned. In this case an additional configuration property is needed to ensure all modules
 are linked to the same component.  
 The configuration will look like this:
 
@@ -54,7 +54,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.5.0</version>
+      <version>1.6.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -74,7 +74,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.5.0</version>
+    <version>1.6.0</version>
   </dependency>
 </dependencies>
 ```
@@ -114,7 +114,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.5.0</version>
+    <version>1.6.0</version>
   </dependency>
 </dependencies>
 ```
@@ -296,7 +296,7 @@ Storages are scanned at runtime.
 Contextmap currently supports scanning the following types of storages:
 
 - **JDBC databases** are scanned by finding Spring beans of type DataSource
-  (javax.sql.DataSource).   
+  (javax.sql.DataSource).  
   Tables and views for the current schema/catalog of the database are included in the scan.
 - **MongoDB** are scanned by finding Spring beans of type MongoTemplate
   (org.springframework.data.mongodb.core.MongoTemplate)
@@ -304,7 +304,6 @@ Contextmap currently supports scanning the following types of storages:
   (org.springframework.data.solr.core.SolrTemplate)
 - **Caches** are scanned by getting the caches from Spring's CacheManager
   (org.springframework.cache.CacheManager)
- 
 
 ##### Decision records
 
