@@ -11,6 +11,9 @@ Contextmap scans your code, generates documentation and visualizes it in a centr
 Contextmap generates documentation by scanning your code.
 The configuration depends on your project's programming language and framework.
 
+In your configurations you need to include the scan-key. This is needed to uniquely identify your organization's account.
+When you login you will find this key under "Administration > Scan".
+
 #### Java with Spring
 
 Most of the scanning happens at compile-time for instance the REST API, entities, markdown, etc. these can be
@@ -31,7 +34,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.6.0</version>
+      <version>1.7.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -54,7 +57,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.6.0</version>
+      <version>1.7.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -74,7 +77,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
   </dependency>
 </dependencies>
 ```
@@ -114,7 +117,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
   </dependency>
 </dependencies>
 ```
@@ -192,6 +195,30 @@ public class Order {
 }
 ```
 
+The custom annotation `@ContextSoftLink` can be used to identify a soft-link between entities.
+This can be used to link entities from the same component, but also between different components.
+Use this annotation to document otherwise hidden dependencies between entities.
+
+For example to link to an entity in the same component:
+
+```java
+@Entity
+public class ProductReadModel {
+  @ContextSoftLink(entity = Product.class)
+  private UUID id;
+}
+```
+
+For example to link to an entity in another component:
+
+```java
+@Entity
+public class OrderItem {
+  @ContextSoftLink(component = "inventory-service", entityName = "Product")
+  private UUID productId;
+}
+```
+
 ##### Published REST API
 
 The published REST API is scanned at compile-time.
@@ -209,7 +236,15 @@ Any method included in such a class with one of the following annotations, is se
 - @PatchMapping (org.springframework.web.bind.annotation.PatchMapping)
 - @RequestMapping (org.springframework.web.bind.annotation.RequestMapping)
 
-The custom annotation `@ContextApiProperty` can be used to customize the documentation of a property.
+REST API's are grouped per class in which they are defined. By default the class' name will be used as title for the group.
+You could annotate the class with any of the following annotations. These provide attributes to customize the name and description
+which are displayed for the group of REST API's.
+
+- @ContextRestApi (io.contextmap.annotations.rest)
+- @Tag (io.swagger.v3.oas.annotations.tags.Tag)
+- @Api (io.swagger.annotations.Api)
+
+The custom annotation `@ContextApiProperty` can be used to customize the documentation of a property of a requestbody or responsebody.
 
 For example:
 
@@ -234,6 +269,8 @@ create a link between the components:
 
 - @FeignClient (org.springframework.cloud.openfeign.FeignClient)
 - @FeignClient (org.springframework.cloud.netflix.feign.FeignClient)
+- @LoadBalancerClient (org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient)
+- @LoadBalancerClients (org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients)
 
 ##### Events
 
