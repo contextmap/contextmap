@@ -34,7 +34,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.7.0</version>
+      <version>1.8.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -57,7 +57,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.7.0</version>
+      <version>1.8.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -77,7 +77,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.7.0</version>
+    <version>1.8.0</version>
   </dependency>
 </dependencies>
 ```
@@ -117,7 +117,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.7.0</version>
+    <version>1.8.0</version>
   </dependency>
 </dependencies>
 ```
@@ -240,9 +240,15 @@ REST API's are grouped per class in which they are defined. By default the class
 You could annotate the class with any of the following annotations. These provide attributes to customize the name and description
 which are displayed for the group of REST API's.
 
-- @ContextRestApi (io.contextmap.annotations.rest)
+- @ContextRestApi (io.contextmap.annotations.rest.ContextRestApi)
 - @Tag (io.swagger.v3.oas.annotations.tags.Tag)
 - @Api (io.swagger.annotations.Api)
+
+Methods can be documented by any of the following annotations. This way a description can be added to the endpoint methods.
+
+- @ContextRestEndpoint (io.contextmap.annotations.rest.ContextRestEndpoint)
+- @Operation (io.swagger.v3.oas.annotations.Operation)
+- @ApiOperation (io.swagger.annotations.ApiOperation)
 
 The custom annotation `@ContextApiProperty` can be used to customize the documentation of a property of a requestbody or responsebody.
 
@@ -400,3 +406,4 @@ public class InvoiceEntity {
   ...
 }
 ```
+
