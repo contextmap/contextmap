@@ -34,7 +34,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.8.0</version>
+      <version>1.8.1</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -57,7 +57,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.8.0</version>
+      <version>1.8.1</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -77,7 +77,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.8.0</version>
+    <version>1.8.1</version>
   </dependency>
 </dependencies>
 ```
@@ -117,7 +117,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.8.0</version>
+    <version>1.8.1</version>
   </dependency>
 </dependencies>
 ```
@@ -277,6 +277,9 @@ create a link between the components:
 - @FeignClient (org.springframework.cloud.netflix.feign.FeignClient)
 - @LoadBalancerClient (org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient)
 - @LoadBalancerClients (org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients)
+- @ContextClient (io.contextmap.annotations.client.ContextClient)
+
+> The custom annotation @ContextClient can be used to model any dependency, not just REST.
 
 ##### Events
 
@@ -348,6 +351,18 @@ Contextmap currently supports scanning the following types of storages:
 - **Caches** are scanned by getting the caches from Spring's CacheManager
   (org.springframework.cache.CacheManager)
 
+Furthermore, a custom annotation @ContextStorage (io.contextmap.annotations.storage.ContextStorage)
+can be used to symbolize any custom types of storage
+
+```java
+// Example of a class responsible for accessing certain files
+// ContextMap can not discover this storage because there is no well-defined SpringBean, hence the need for the custom annotation
+@ContextStorage(name = "training-sets", type = StorageType.FILE_SYSTEM)
+public class TrainingSetData {
+  ...
+}
+```
+
 ##### Decision records
 
 Decision records and other markdown files are scanned at compile-time.
@@ -406,4 +421,5 @@ public class InvoiceEntity {
   ...
 }
 ```
+
 
