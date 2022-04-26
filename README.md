@@ -1,9 +1,3 @@
-# ContextMap
-
-Knowledge sharing and collaboration in an event-driven architecture, with polyglot microservices and self-organizing teams doing devops... it's a challenge.
-Contextmap scans your code, generates documentation and visualizes it in a centralized developer portal: accurate, zero-effort and always up to date documentation
-
-
 ## Getting started
 
 ### Configuration
@@ -34,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.8.1</version>
+      <version>1.9.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -57,7 +51,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.8.1</version>
+      <version>1.9.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -77,7 +71,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.8.1</version>
+    <version>1.9.0</version>
   </dependency>
 </dependencies>
 ```
@@ -117,7 +111,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.8.1</version>
+    <version>1.9.0</version>
   </dependency>
 </dependencies>
 ```
@@ -135,19 +129,19 @@ The properties are scanned at compile-time.
 The overview of a component contains the following details:
 
 - **System name** is based on the property contextmap.scan.system-name in your .properties file or .yml file,
-  if not available then it falls back to the &lt;groupId /&gt; in the pom.xml
+  if not available then it falls back to the <groupId /> in the pom.xml
 - **Component name** is based on the property spring.application.name in your .properties file or .yml file,
-  if not available then it falls back to the &lt;name /&gt; in the pom.xml
-- **Domain vision statement** is based on the &lt;description /&gt; in the pom.xml
-- **Technology** is based on the &lt;dependencies /&gt; in the pom.xml
-- **Team** is based on the first &lt;developer /&gt; in the pom.xml
+  if not available then it falls back to the <name /> in the pom.xml
+- **Domain vision statement** is based on the <description /> in the pom.xml
+- **Technology** is based on the <dependencies /> in the pom.xml
+- **Team** is based on the first <developer /> in the pom.xml
 - **Bytes of code** is determined by scanning the files in your source folder, counting the filesizes
 - **Languages** are determined by scanning the files in your source folder, and looking at the filenames
-- **Version** is based on the &lt;version /&gt; in the pom.xml
-- **Url issue management** is based on the url from &lt;issueManagement&gt;&lt;url /&gt;&lt;/issueManagement&gt; in the pom.xml
-- **Url source code** is based on the url from &lt;scm&gt;&lt;url /&gt;&lt;/scm&gt; in the pom.xml
-- **Url for external documentation** is based on the &lt;url /&gt; in the pom.xml
-- **Url buid pipeline** is based on the url from &lt;ciManagement&gt;&lt;url /&gt;&lt;/ciManagement&gt; in the pom.xml
+- **Version** is based on the <version /> in the pom.xml
+- **Url issue management** is based on the url from <issueManagement><url /></issueManagement> in the pom.xml
+- **Url source code** is based on the url from <scm><url /></scm> in the pom.xml
+- **Url for external documentation** is based on the <url /> in the pom.xml
+- **Url buid pipeline** is based on the url from <ciManagement><url /></ciManagement> in the pom.xml
 - **Component type** is based on the property contextmap.scan.component-type in your .properties file or .yml file,
   its value can be `MICROSERVICE`, `MICROFRONTEND` or `GATEWAY`,
   if not available then it falls back to the default value `MICROSERVICE`
@@ -271,7 +265,8 @@ public class OrderDto {
 The subscribed REST API is scanned at compile-time.
 The synchronous links between components in contextmap are based on the subscribed REST APIs.
 The following annotations will identify a class as a subscribed REST API, and as such
-create a link between the components:
+create a link between the components. The name attribute of these annotations will be used, to
+identify the component.
 
 - @FeignClient (org.springframework.cloud.openfeign.FeignClient)
 - @FeignClient (org.springframework.cloud.netflix.feign.FeignClient)
@@ -280,6 +275,10 @@ create a link between the components:
 - @ContextClient (io.contextmap.annotations.client.ContextClient)
 
 > The custom annotation @ContextClient can be used to model any dependency, not just REST.
+
+When using Spring Cloud Gateway, the configuration files are scanned to find routes.
+Any configured route which has a load balanced uri-property (i.e. starting with "lb://") will be identified
+as a link to another component.
 
 ##### Events
 
@@ -422,4 +421,30 @@ public class InvoiceEntity {
 }
 ```
 
+##### Actors
 
+The actors are scanned at compile-time.
+Use the custom annotation @ContextActor to indicate that a certain actor uses the component.
+
+For example:
+
+```java
+@ContextActor("Helpdesk")
+public class OrderApplication {
+  ...
+}
+```
+
+Or use @ContextActors, to link multiple actors at once.
+
+For example:
+
+```java
+@ContextActors({
+  @ContextActor("Data Scientist"), 
+  @ContextActor("Data Engineer")
+})
+public class DataAnalysisApplication {
+  ...
+}
+```
