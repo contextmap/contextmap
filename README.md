@@ -28,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.9.0</version>
+      <version>1.12.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -51,7 +51,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.9.0</version>
+      <version>1.12.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -71,7 +71,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.9.0</version>
+    <version>1.12.0</version>
   </dependency>
 </dependencies>
 ```
@@ -111,7 +111,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.9.0</version>
+    <version>1.12.0</version>
   </dependency>
 </dependencies>
 ```
@@ -119,9 +119,54 @@ To do so, add the following dependency to your pom.xml file.
 You can read more below on how to use these custom annotations.
 We do recommend to limit the use of custom annotations to only those cases where it really helps to improve knowledge sharing.
 
+#### Typescript
+
+Any framework which uses typescript can be scanned, for instance Angular, React, etc.
+Also note that with the help of @babel/plugin-proposal-decorators you can also configure a non-typescript pure javascript project.
+
+##### Compile-time scan
+To configure compile-time scanning of your project, add the following dev-dependency to your package.json file.
+Afterwards you can run the compile-time scan either manually, and/or configure your CI/CD pipeline to run the scan.
+The command to run the compile-time scan is "`npm run contextmap:scan`". 
+
+```json
+"scripts": {
+  ...
+  "contextmap:scan": "node node_modules/@contextmap/typescript-compiletime/cli.js"
+},
+...
+"devDependencies": {
+  ...
+  "@contextmap/typescript-compiletime": "^1.0.0",
+},
+...
+"contextmap": {
+  "key": "PLACE_KEY_HERE"
+}
+```
+
+> ✔️ We highly recommend to modify your CI/CD pipeline to include the contextmap scan.
+> This way your documentation will be automatically kept up to date.
+ 
+Instead of configuring the key as a property, you can also add it as argument to the script via `--key=PLACE_KEY_HERE`. This
+way, you can for instance refer to an environment variable if needed.
+
+##### Custom decorators
+Your code already contains lots of knowledge and information, which contextmap scans as-is.
+But sometimes you might want to give a little nudge to your documentation, to emphasize or rephrase something.
+We have foreseen a package with custom decorators that can be used to achieve this.
+To do so, add the following dependency to your package.json file.
+
+```json
+"dependencies": {
+  ...
+  "@contextmap/typescript-decorators": "^1.0.0"
+}
+```
+
 ### What is documented
 
-#### Java
+#### Java with Spring
 
 ##### Properties
 
@@ -260,6 +305,10 @@ public class OrderDto {
 > By default the name of a property's class is used as its datatype.
 > Also by default, all possible values of an enum property are included as example.
 
+If no endpoints are found while scanning for annotations, then a scan for **Spring REST Docs** snippets occurs.
+During the build of projects which use Spring REST Docs to document the api, you will need to make sure that 
+the snippets are generated before scanning for contextmap, i.e. the tests need to have run.
+
 ##### Subscribed REST API
 
 The subscribed REST API is scanned at compile-time.
@@ -296,7 +345,9 @@ Exchanges on which the scanned component publishes messages are scanned by findi
 - Exchange (org.springframework.amqp.core.Exchange)
 - RabbitTemplate (org.springframework.amqp.rabbit.core.RabbitTemplate)
 
-Queues on which the scanned component subscribes are scanned by finding Spring beans of type
+Also logback AMQP appenders are scanned and identified as exchanges. 
+
+Queues on which a component subscribes are scanned by finding Spring beans of type
 Binding (org.springframework.amqp.core.Binding)
 
 ###### ActiveMQ (JMS)
@@ -441,10 +492,60 @@ For example:
 
 ```java
 @ContextActors({
-  @ContextActor("Data Scientist"), 
+  @ContextActor("Data Scientist"),
   @ContextActor("Data Engineer")
 })
 public class DataAnalysisApplication {
+  ...
+}
+```
+
+
+#### Typescript
+
+##### Properties
+The properties are scanned at compile-time.
+The overview of a component contains the following details:
+
+- **System name** is based on the property contextmap.scan.systemName from the package.json file
+- **Component name** is based on the property name from the package.json file
+- **Domain vision statement** is based on the description from the package.json file
+- **Technology** is based on the dependencies from the package.json file
+- **Team** COMING SOON
+- **Bytes of code** COMING SOON
+- **Languages** COMING SOON
+- **Version** is based on the version from the package.json file
+- **Url issue management** COMING SOON
+- **Url source code** COMING SOON
+- **Url for external documentation** COMING SOON
+- **Url buid pipeline** COMING SOON
+- **Component type** is based on the property contextmap.scan.componentType from the package.json file,
+  its value can be `MICROSERVICE`, `MICROFRONTEND` or `GATEWAY`,
+  if not available then it falls back to the default value `MICROFRONTEND`
+
+##### Subscribed REST API
+The subscribed REST API is scanned at compile-time.
+The synchronous links between components in contextmap are based on the subscribed REST APIs.
+Use the custom decorator @ContextClient to identify a dependency to another component.
+
+For example:
+
+```typescript
+@ContextClient('webshop-site-gateway')
+export class GatewayHttpService {
+  ...
+}
+```
+
+##### Actors
+The actors are scanned at compile-time.
+Use the custom decorator @ContextActor to indicate that a certain actor uses the component.
+
+For example:
+
+```typescript
+@ContextActor('Customer')
+export class AppComponent {
   ...
 }
 ```
