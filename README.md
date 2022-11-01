@@ -22,19 +22,20 @@ your CI/CD pipeline to run the scan.
 The command to run the compile-time scan is "`mvn contextmap:scan`".
 Make sure to run this command with the root directory of your project as current directory.
 
-```xml
+```xml  
 <build>
   <plugins>
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.12.0</version>
+      <version>1.15.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
     </plugin>
   </plugins>
 </build>
+
 ```
 
 > ✔️ We highly recommend to modify your CI/CD pipeline to include the contextmap scan.
@@ -51,7 +52,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.12.0</version>
+      <version>1.15.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -71,7 +72,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.12.0</version>
+    <version>1.15.0</version>
   </dependency>
 </dependencies>
 ```
@@ -79,7 +80,7 @@ The runtime scan will only happen once at startup of your project.
 By default the scan at startup is disabled. To enable it and to define the necessary key, add the following
 to your configuration file (for instance the application.properties file)
 
-```properties
+```ini
 contextmap.key=PLACE_KEY_HERE
 contextmap.enabled=true
 ```
@@ -93,7 +94,7 @@ For multi-module maven projects, the dependency needs to be added in the module 
 An additional property is required to indicate that the runtime scan needs to be added to a multi-module project.  
 The configuration will look like this:
 
-```properties
+```ini
 contextmap.key=PLACE_KEY_HERE
 contextmap.enabled=true
 contextmap.scan.multi-module-component-name=COMPONENT_NAME
@@ -111,7 +112,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.12.0</version>
+    <version>1.15.0</version>
   </dependency>
 </dependencies>
 ```
@@ -131,15 +132,11 @@ The command to run the compile-time scan is "`npm run contextmap:scan`".
 
 ```json
 "scripts": {
-  ...
   "contextmap:scan": "node node_modules/@contextmap/typescript-compiletime/cli.js"
 },
-...
 "devDependencies": {
-  ...
   "@contextmap/typescript-compiletime": "^1.0.0",
 },
-...
 "contextmap": {
   "key": "PLACE_KEY_HERE"
 }
@@ -159,7 +156,6 @@ To do so, add the following dependency to your package.json file.
 
 ```json
 "dependencies": {
-  ...
   "@contextmap/typescript-decorators": "^1.0.0"
 }
 ```
@@ -179,7 +175,9 @@ The overview of a component contains the following details:
   if not available then it falls back to the <name /> in the pom.xml
 - **Domain vision statement** is based on the <description /> in the pom.xml
 - **Technology** is based on the <dependencies /> in the pom.xml
-- **Team** is based on the first <developer /> in the pom.xml
+- **Team** is based on the name of the first <developer /> in the pom.xml
+- **Team's organization** is based on the organization of the first <developer /> in the pom.xml
+- **Team's email** is based on the email of the first <developer /> in the pom.xml
 - **Bytes of code** is determined by scanning the files in your source folder, counting the filesizes
 - **Languages** are determined by scanning the files in your source folder, and looking at the filenames
 - **Version** is based on the <version /> in the pom.xml
@@ -210,9 +208,17 @@ Domain entities are scanned at compile-time based on any of the following annota
 For example:
 
 ```java
+// For example when using JPA 
 @Entity
 public class Order {
-  ...
+
+}
+
+// For example, when a class is considered part of the domain
+// even when it is not necessarily persisted
+@ContextEntity
+public class Order {
+
 }
 ```
 
@@ -230,7 +236,7 @@ For example:
 @Entity
 @ContextAggregateRoot
 public class Order {
-  ...
+
 }
 ```
 
@@ -243,8 +249,10 @@ For example to link to an entity in the same component:
 ```java
 @Entity
 public class ProductReadModel {
+    
   @ContextSoftLink(entity = Product.class)
   private UUID id;
+  
 }
 ```
 
@@ -253,8 +261,10 @@ For example to link to an entity in another component:
 ```java
 @Entity
 public class OrderItem {
+    
   @ContextSoftLink(component = "inventory-service", entityName = "Product")
   private UUID productId;
+  
 }
 ```
 
@@ -295,10 +305,10 @@ For example:
 
 ```java
 public class OrderDto {
-  ...
+    
   @ContextApiProperty(description = "This datetime is in ISO-8601", example = "2021-12-31")
   private LocalDateTime createdOn;
-  ...
+
 }
 ```
 
@@ -333,10 +343,11 @@ as a link to another component.
 
 Events are scanned at runtime.
 The asynchronous links between components in contextmap are based on the events.
-Contextmap currently supports scanning the following eventing solutions
+Contextmap currently supports scanning events for the following message brokers
 
 - RabbitMQ
 - ActiveMQ (JMS)
+- Kafka
 
 ###### RabbitMQ
 
@@ -360,6 +371,17 @@ Queues/Topics on which the scanned component publishes messages are scanned by f
 Queues/Topics on which the scanned component subscribes are scanned by finding beans with methods
 annotated with @JmsListener (org.springframework.jms.annotation.JmsListener)
 
+###### Kafka
+
+Topics on which the scanned component publishes messages are scanned by finding Spring beans of type
+
+- NewTopic (org.apache.kafka.clients.admin.NewTopic)
+- KafkaTemplate (org.springframework.kafka.core.KafkaTemplate)
+
+Topcis on which a component subscribes are scanned by finding Spring beans annotated by
+KafkaListener (org.springframework.kafka.annotation.KafkaListener)
+
+
 ###### Event Payload
 
 Use the custom annotation `@ContextEvent` to allow contextmap to identify the payload
@@ -370,19 +392,25 @@ For example:
 // For RabbitMQ you can refer to the name of an Exchange or RabbitTemplate registered as Spring Bean
 @ContextEvent(publishedBy = "orderCreatedExchange")
 public class OrderCreated {
-  ...
+
 }
 
 // For ActiveMQ you can refer to the name of a Queue or Topic registered as Spring Bean
 @ContextEvent(publishedBy = "orderCreatedTopic")
 public class OrderCreated {
-  ...
+
+}
+
+// For Kafka you can refer to the name of a Topic or KafkaTemplate registered as Spring Bean
+@ContextEvent(publishedBy = "orderCreatedTopic")
+public class OrderCreated {
+
 }
 
 // Or you could refer to a configuration property for the target name on which is published
 @ContextEvent(publishedBy = "${order-created.exchange}")
 public class OrderCreated {
-  ...
+
 }
 ```
 
@@ -409,7 +437,7 @@ can be used to symbolize any custom types of storage
 // ContextMap can not discover this storage because there is no well-defined SpringBean, hence the need for the custom annotation
 @ContextStorage(name = "training-sets", type = StorageType.FILE_SYSTEM)
 public class TrainingSetData {
-  ...
+
 }
 ```
 
@@ -421,6 +449,26 @@ Each file with extension `.md`, `.ad` or `.adr` will be included.
 
 Unmodified files will be ignored. If you modify a file which was previously scanned, then
 the next time it is scanned it will be updated.
+
+Note that [Mermaid](https://mermaid-js.github.io/mermaid/#/) diagrams can be included. 
+
+##### Diagrams
+
+PlantUML diagrams included in your project are scanned at compile-time.
+This is done by looking at the source folder and checking the file-extension.
+Each file with extension `.puml`, `.iuml` or `.plantuml` will be included.
+
+Unmodified files will be ignored. If you modify a file which was previously scanned, then
+the next time it is scanned it will be updated.
+
+The Smetana rendering engine of PlantUML is used. Depending on the diagram, this means you may need to add
+an extra configuration line to ensure the diagram is rendered correctly.
+```plantuml
+@startuml
+!pragma layout smetana    <-- extra configuration line
+
+@enduml
+```
 
 ##### Features
 
@@ -454,7 +502,7 @@ For example:
 ```java
 @ContextGlossary("A request to make, supply, or deliver food or goods")
 public class Order {
-  ...
+
 }
 ```
 
@@ -468,7 +516,7 @@ You can also document any aliases which could be used for the same term.
   aliases = {"Bill"}
 )
 public class InvoiceEntity {
-  ...
+
 }
 ```
 
@@ -482,7 +530,7 @@ For example:
 ```java
 @ContextActor("Helpdesk")
 public class OrderApplication {
-  ...
+
 }
 ```
 
@@ -496,7 +544,7 @@ For example:
   @ContextActor("Data Engineer")
 })
 public class DataAnalysisApplication {
-  ...
+
 }
 ```
 
@@ -512,6 +560,7 @@ The overview of a component contains the following details:
 - **Domain vision statement** is based on the description from the package.json file
 - **Technology** is based on the dependencies from the package.json file
 - **Team** COMING SOON
+- **Organization** COMING SOON
 - **Bytes of code** COMING SOON
 - **Languages** COMING SOON
 - **Version** is based on the version from the package.json file
@@ -533,7 +582,7 @@ For example:
 ```typescript
 @ContextClient('webshop-site-gateway')
 export class GatewayHttpService {
-  ...
+
 }
 ```
 
@@ -546,6 +595,6 @@ For example:
 ```typescript
 @ContextActor('Customer')
 export class AppComponent {
-  ...
+
 }
 ```
