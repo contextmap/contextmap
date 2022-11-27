@@ -28,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.15.0</version>
+      <version>1.16.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -52,7 +52,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.15.0</version>
+      <version>1.16.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -72,7 +72,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.15.0</version>
+    <version>1.16.0</version>
   </dependency>
 </dependencies>
 ```
@@ -112,7 +112,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.15.0</version>
+    <version>1.16.0</version>
   </dependency>
 </dependencies>
 ```
@@ -186,7 +186,7 @@ The overview of a component contains the following details:
 - **Url for external documentation** is based on the <url /> in the pom.xml
 - **Url buid pipeline** is based on the url from <ciManagement><url /></ciManagement> in the pom.xml
 - **Component type** is based on the property contextmap.scan.component-type in your .properties file or .yml file,
-  its value can be `MICROSERVICE`, `MICROFRONTEND` or `GATEWAY`,
+  its value can be `MICROSERVICE`, `MICROFRONTEND`, `GATEWAY` or `LIBRARY` 
   if not available then it falls back to the default value `MICROSERVICE`
 
 ##### Domain Entities
@@ -289,17 +289,22 @@ REST API's are grouped per class in which they are defined. By default the class
 You could annotate the class with any of the following annotations. These provide attributes to customize the name and description
 which are displayed for the group of REST API's.
 
-- @ContextRestApi (io.contextmap.annotations.rest.ContextRestApi)
-- @Tag (io.swagger.v3.oas.annotations.tags.Tag)
-- @Api (io.swagger.annotations.Api)
+- Swagger's @Tag (io.swagger.v3.oas.annotations.tags.Tag)
+- Swagger's @Api (io.swagger.annotations.Api)
+- Custom annotation @ContextRestApi (io.contextmap.annotations.rest.ContextRestApi)
 
 Methods can be documented by any of the following annotations. This way a description can be added to the endpoint methods.
 
-- @ContextRestEndpoint (io.contextmap.annotations.rest.ContextRestEndpoint)
-- @Operation (io.swagger.v3.oas.annotations.Operation)
-- @ApiOperation (io.swagger.annotations.ApiOperation)
+- Swagger's @Operation (io.swagger.v3.oas.annotations.Operation)
+- Swagger's @ApiOperation (io.swagger.annotations.ApiOperation)
+- Custom annotation @ContextRestEndpoint (io.contextmap.annotations.rest.ContextRestEndpoint)
 
-The custom annotation `@ContextApiProperty` can be used to customize the documentation of a property of a requestbody or responsebody.
+
+Properties of a requestbody or responsebody can be documented by any of the following annotations. 
+
+- Swagger's @Schema (io.swagger.v3.oas.annotations.media.Schema)
+- Swagger's @ApiModelProperty (io.swagger.annotations.ApiModelProperty)
+- Custom annotation @ContextApiProperty (io.contextmap.annotations.ContextApiProperty)
 
 For example:
 
@@ -348,6 +353,7 @@ Contextmap currently supports scanning events for the following message brokers
 - RabbitMQ
 - ActiveMQ (JMS)
 - Kafka
+
 
 ###### RabbitMQ
 
@@ -413,6 +419,8 @@ public class OrderCreated {
 
 }
 ```
+
+Any annotation used to document a REST requestbody or responsebody, can also be used to document the payload of an event.
 
 ##### Storages
 
