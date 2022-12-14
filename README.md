@@ -135,7 +135,7 @@ The command to run the compile-time scan is "`npm run contextmap:scan`".
   "contextmap:scan": "node node_modules/@contextmap/typescript-compiletime/cli.js"
 },
 "devDependencies": {
-  "@contextmap/typescript-compiletime": "^1.0.0",
+  "@contextmap/typescript-compiletime": "^1.1.0",
 },
 "contextmap": {
   "key": "PLACE_KEY_HERE"
@@ -567,17 +567,18 @@ The overview of a component contains the following details:
 - **Component name** is based on the property name from the package.json file
 - **Domain vision statement** is based on the description from the package.json file
 - **Technology** is based on the dependencies from the package.json file
-- **Team** COMING SOON
-- **Organization** COMING SOON
-- **Bytes of code** COMING SOON
-- **Languages** COMING SOON
+- **Team** is based on the property author.name from the package.json file
+- **Team's organization** is based on the property contextmap.scan.organization from the package.json file
+- **Team's email** is based on the property author.email from the package.json file
+- **Bytes of code** is determined by scanning the source files, counting the filesizes
+- **Languages** are determined by scanning the source files, and looking at the filenames
 - **Version** is based on the version from the package.json file
 - **Url issue management** COMING SOON
 - **Url source code** COMING SOON
 - **Url for external documentation** COMING SOON
-- **Url buid pipeline** COMING SOON
+- **Url build pipeline** COMING SOON
 - **Component type** is based on the property contextmap.scan.componentType from the package.json file,
-  its value can be `MICROSERVICE`, `MICROFRONTEND` or `GATEWAY`,
+  its value can be `MICROSERVICE`, `MICROFRONTEND`, `GATEWAY` or `LIBRARY`
   if not available then it falls back to the default value `MICROFRONTEND`
 
 ##### Subscribed REST API
@@ -590,6 +591,69 @@ For example:
 ```typescript
 @ContextClient('webshop-site-gateway')
 export class GatewayHttpService {
+
+}
+```
+
+
+##### Decision records
+
+Decision records and other markdown files are scanned at compile-time.
+This is done by looking at the source folder and checking the file-extension.
+Each file with extension `.md`, `.ad` or `.adr` will be included.
+
+Unmodified files will be ignored. If you modify a file which was previously scanned, then
+the next time it is scanned it will be updated.
+
+Note that [Mermaid](https://mermaid-js.github.io/mermaid/#/) diagrams can be included.
+
+
+##### Features
+
+Features are scanned at compile-time.
+This is done by looking at the source folder and checking the file-extension.
+Each file with extension `.feature`, or `.story` will be included.
+
+Unmodified files will be ignored. If you modify a file which was previously scanned, then
+the next time it is scanned it will be updated.
+
+##### Releases
+
+Releases are scanned at compile-time.
+All local tags in Git will be included. The commits associated with each tag are also included.
+Only the date and the message of a commit is tracked.
+Other information (such as the person who made the commit) is not tracked.
+
+##### Recent Commits
+
+Recent commits are scanned at compile-time.
+All commits in Git from the last 90 days will be included.
+Only the date and the message of a commit is tracked.
+Other information (such as the person who made the commit) is not tracked.
+
+##### Glossary
+
+The glossary terms are scanned at compile-time.
+Use the custom decorator @ContextGlossary to scan for terms to include in your glossary.
+For example:
+
+```typescript
+@ContextGlossary({ definition: 'A request to make, supply, or deliver food or goods' })
+export class Order {
+
+}
+```
+
+You can specify the name attribute in case the name of the class is not the term you want to use in the glossary.
+You can also document any aliases which could be used for the same term.
+
+```typescript
+@ContextGlossary({
+  name: 'Invoice',
+  definition: 'A list of goods sent or services provided, with a statement of the sum due for these',
+  aliases: ['Bill']
+})
+export class InvoiceEntity {
 
 }
 ```
