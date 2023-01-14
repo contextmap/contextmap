@@ -1,6 +1,6 @@
-## Getting started
+# Getting started
 
-### Configuration
+## Configuration
 
 Contextmap generates documentation by scanning your code.
 The configuration depends on your project's programming language and framework.
@@ -8,13 +8,13 @@ The configuration depends on your project's programming language and framework.
 In your configurations you need to include the scan-key. This is needed to uniquely identify your organization's account.
 When you login you will find this key under "Administration > Scan".
 
-#### Java with Spring
+### Java with Spring
 
 Most of the scanning happens at compile-time for instance the REST API, entities, markdown, etc. these can be
 extracted from the code. However, some things are only known at runtime, for instance Spring beans, config-server settings, etc.
 Therefor to run a complete scan of the code you should configure both the compile-time plugin and runtime dependency.
 
-##### Compile-time scan
+#### Compile-time scan
 
 To configure compile-time scanning of your project, add the following plugin
 to your pom.xml file. Afterwards you can run the compile-time scan either manually, and/or configure
@@ -28,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.16.0</version>
+      <version>1.19.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -52,7 +52,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.16.0</version>
+      <version>1.19.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -62,7 +62,7 @@ The configuration will look like this:
 </build>
 ```
 
-##### Runtime scan
+#### Runtime scan
 
 To configure the runtime scanning of your project, add the following dependency to your pom.xml file.
 The runtime scan will only happen once at startup of your project.
@@ -72,7 +72,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.16.0</version>
+    <version>1.19.0</version>
   </dependency>
 </dependencies>
 ```
@@ -100,7 +100,7 @@ contextmap.enabled=true
 contextmap.scan.multi-module-component-name=COMPONENT_NAME
 ```
 
-##### Custom annotations
+#### Custom annotations
 
 Your code already contains lots of knowledge and information, which contextmap scans as-is.
 But sometimes you might want to give a little nudge to your documentation, to emphasize or rephrase something.
@@ -112,7 +112,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.16.0</version>
+    <version>1.19.0</version>
   </dependency>
 </dependencies>
 ```
@@ -120,12 +120,21 @@ To do so, add the following dependency to your pom.xml file.
 You can read more below on how to use these custom annotations.
 We do recommend to limit the use of custom annotations to only those cases where it really helps to improve knowledge sharing.
 
-#### Typescript
+#### Deployments
+
+If you have multiple environments, then you can document which version is deployed to which environment.
+This allows you to see deployments in the releases overview of your components.
+
+To achieve this, add the following command to your deployment workflow "`mvn contextmap:deployment -Dversion=VERSION -Denvironment=ENVIRONMENT`".
+The version and environment parameters are to be filled in by your workflow.
+
+
+### Typescript
 
 Any framework which uses typescript can be scanned, for instance Angular, React, etc.
 Also note that with the help of @babel/plugin-proposal-decorators you can also configure a non-typescript pure javascript project.
 
-##### Compile-time scan
+#### Compile-time scan
 To configure compile-time scanning of your project, add the following dev-dependency to your package.json file.
 Afterwards you can run the compile-time scan either manually, and/or configure your CI/CD pipeline to run the scan.
 The command to run the compile-time scan is "`npm run contextmap:scan`". 
@@ -135,7 +144,7 @@ The command to run the compile-time scan is "`npm run contextmap:scan`".
   "contextmap:scan": "node node_modules/@contextmap/typescript-compiletime/cli.js"
 },
 "devDependencies": {
-  "@contextmap/typescript-compiletime": "^1.1.0",
+  "@contextmap/typescript-compiletime": "^1.2.0",
 },
 "contextmap": {
   "key": "PLACE_KEY_HERE"
@@ -148,7 +157,7 @@ The command to run the compile-time scan is "`npm run contextmap:scan`".
 Instead of configuring the key as a property, you can also add it as argument to the script via `--key=PLACE_KEY_HERE`. This
 way, you can for instance refer to an environment variable if needed.
 
-##### Custom decorators
+#### Custom decorators
 Your code already contains lots of knowledge and information, which contextmap scans as-is.
 But sometimes you might want to give a little nudge to your documentation, to emphasize or rephrase something.
 We have foreseen a package with custom decorators that can be used to achieve this.
@@ -160,11 +169,25 @@ To do so, add the following dependency to your package.json file.
 }
 ```
 
-### What is documented
+#### Deployments
 
-#### Java with Spring
+If you have multiple environments, then you can document which version is deployed to which environment.
+This allows you to see deployments in the releases overview of your components.
 
-##### Properties
+To achieve this, add the following command to your deployment workflow "`npm run contextmap:deployment -- --version=VERSION --environment=ENVIRONMENT`".
+The version and environment parameters are to be filled in by your workflow.
+
+```json
+"scripts": {
+  "contextmap:deployment": "node node_modules/@contextmap/typescript-compiletime/deployment.js"
+}
+```
+
+## What is documented
+
+### Java with Spring
+
+#### Properties
 
 The properties are scanned at compile-time.
 The overview of a component contains the following details:
@@ -189,7 +212,7 @@ The overview of a component contains the following details:
   its value can be `MICROSERVICE`, `MICROFRONTEND`, `GATEWAY` or `LIBRARY` 
   if not available then it falls back to the default value `MICROSERVICE`
 
-##### Domain Entities
+#### Domain Entities
 
 Domain entities are scanned at compile-time based on any of the following annotations:
 
@@ -197,11 +220,13 @@ Domain entities are scanned at compile-time based on any of the following annota
 - @MappedSuperclass (javax.persistence.MappedSuperclass)
 - @Document (org.springframework.data.mongodb.core.mapping.Document,
   org.springframework.data.elasticsearch.annotations.Document,
-  org.springframework.data.couchbase.core.mapping.Document)
+  org.springframework.data.couchbase.core.mapping.Document,
+  com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document)
 - @SolrDocument (org.springframework.data.solr.core.mapping.SolrDocument)
 - @RedisHash (org.springframework.data.redis.core.RedisHash)
 - @Table (org.springframework.data.cassandra.core.mapping.Table)
 - @Node (org.springframework.data.neo4j.core.schema.Node)
+- @Container (com.azure.spring.data.cosmos.core.mapping.Container)
 - @ContextAggregateRoot (io.contextmap.annotations.ContextAggregateRoot)
 - @ContextEntity (io.contextmap.annotations.ContextEntity)
 
@@ -227,8 +252,10 @@ The following annotations will identify an entity as aggregate root:
 - @ContextAggregateRoot (io.contextmap.annotations.ContextAggregateRoot)
 - @Document (org.springframework.data.mongodb.core.mapping.Document,
   org.springframework.data.elasticsearch.annotations.Document,
-  org.springframework.data.couchbase.core.mapping.Document)
+  org.springframework.data.couchbase.core.mapping.Document,
+  com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document)
 - @SolrDocument (org.springframework.data.solr.core.mapping.SolrDocument)
+- @Container (com.azure.spring.data.cosmos.core.mapping.Container)
 
 For example:
 
@@ -268,7 +295,7 @@ public class OrderItem {
 }
 ```
 
-##### Published REST API
+#### Published REST API
 
 The published REST API is scanned at compile-time.
 The following annotations will identify a class as a published REST API:
@@ -324,7 +351,7 @@ If no endpoints are found while scanning for annotations, then a scan for **Spri
 During the build of projects which use Spring REST Docs to document the api, you will need to make sure that 
 the snippets are generated before scanning for contextmap, i.e. the tests need to have run.
 
-##### Subscribed REST API
+#### Subscribed REST API
 
 The subscribed REST API is scanned at compile-time.
 The synchronous links between components in contextmap are based on the subscribed REST APIs.
@@ -344,7 +371,7 @@ When using Spring Cloud Gateway, the configuration files are scanned to find rou
 Any configured route which has a load balanced uri-property (i.e. starting with "lb://") will be identified
 as a link to another component.
 
-##### Events
+#### Events
 
 Events are scanned at runtime.
 The asynchronous links between components in contextmap are based on the events.
@@ -355,7 +382,7 @@ Contextmap currently supports scanning events for the following message brokers
 - Kafka
 
 
-###### RabbitMQ
+##### RabbitMQ
 
 Exchanges on which the scanned component publishes messages are scanned by finding Spring beans of type
 
@@ -367,7 +394,7 @@ Also logback AMQP appenders are scanned and identified as exchanges.
 Queues on which a component subscribes are scanned by finding Spring beans of type
 Binding (org.springframework.amqp.core.Binding)
 
-###### ActiveMQ (JMS)
+##### ActiveMQ (JMS)
 
 Queues/Topics on which the scanned component publishes messages are scanned by finding Spring beans of type
 
@@ -377,7 +404,7 @@ Queues/Topics on which the scanned component publishes messages are scanned by f
 Queues/Topics on which the scanned component subscribes are scanned by finding beans with methods
 annotated with @JmsListener (org.springframework.jms.annotation.JmsListener)
 
-###### Kafka
+##### Kafka
 
 Topics on which the scanned component publishes messages are scanned by finding Spring beans of type
 
@@ -388,7 +415,7 @@ Topcis on which a component subscribes are scanned by finding Spring beans annot
 KafkaListener (org.springframework.kafka.annotation.KafkaListener)
 
 
-###### Event Payload
+##### Event Payload
 
 Use the custom annotation `@ContextEvent` to allow contextmap to identify the payload
 (or potentially multiple payloads) of an event which is published.
@@ -422,7 +449,7 @@ public class OrderCreated {
 
 Any annotation used to document a REST requestbody or responsebody, can also be used to document the payload of an event.
 
-##### Storages
+#### Storages
 
 Storages are scanned at runtime.
 Contextmap currently supports scanning the following types of storages:
@@ -430,10 +457,17 @@ Contextmap currently supports scanning the following types of storages:
 - **JDBC databases** are scanned by finding Spring beans of type DataSource
   (javax.sql.DataSource).  
   Tables and views for the current schema/catalog of the database are included in the scan.
-- **MongoDB** are scanned by finding Spring beans of type MongoTemplate
-  (org.springframework.data.mongodb.core.MongoTemplate)
+- **MongoDB** is scanned by finding Spring beans of type MongoTemplate 
+  (org.springframework.data.mongodb.core.MongoTemplate) and ReactiveMongoTemplate 
+  (org.springframework.data.mongodb.core.ReactiveMongoTemplate)
+- **CosmosDB** is scanned by finding Spring beans of type CosmosTemplate 
+  (com.azure.spring.data.cosmos.core.CosmosTemplate) and ReactiveCosmosTemplate 
+  (com.azure.spring.data.cosmos.core.ReactiveCosmosTemplate)
 - **Solr** is scanned by finding Spring beans of type SolrTemplate
   (org.springframework.data.solr.core.SolrTemplate)
+- **ElasticSearch** is scanned by finding Spring beans of type RestHighLevelClient
+  (org.elasticsearch.client.RestHighLevelClient), if none are detected then bean of type RestClient
+  (org.elasticsearch.client.RestClient) are scanned
 - **Caches** are scanned by getting the caches from Spring's CacheManager
   (org.springframework.cache.CacheManager)
 
@@ -449,7 +483,7 @@ public class TrainingSetData {
 }
 ```
 
-##### Decision records
+#### Decision records
 
 Decision records and other markdown files are scanned at compile-time.
 This is done by looking at the source folder and checking the file-extension.
@@ -460,7 +494,7 @@ the next time it is scanned it will be updated.
 
 Note that [Mermaid](https://mermaid-js.github.io/mermaid/#/) diagrams can be included. 
 
-##### Diagrams
+#### Diagrams
 
 PlantUML diagrams included in your project are scanned at compile-time.
 This is done by looking at the source folder and checking the file-extension.
@@ -478,7 +512,7 @@ an extra configuration line to ensure the diagram is rendered correctly.
 @enduml
 ```
 
-##### Features
+#### Features
 
 Features are scanned at compile-time.
 This is done by looking at the source folder and checking the file-extension.
@@ -487,21 +521,21 @@ Each file with extension `.feature`, or `.story` will be included.
 Unmodified files will be ignored. If you modify a file which was previously scanned, then
 the next time it is scanned it will be updated.
 
-##### Releases
+#### Releases
 
 Releases are scanned at compile-time.
 All local tags in Git will be included. The commits associated with each tag are also included.
 Only the date and the message of a commit is tracked.
 Other information (such as the person who made the commit) is not tracked.
 
-##### Recent Commits
+#### Recent Commits
 
 Recent commits are scanned at compile-time.
 All commits in Git from the last 90 days will be included.
 Only the date and the message of a commit is tracked.
 Other information (such as the person who made the commit) is not tracked.
 
-##### Glossary
+#### Glossary
 
 The glossary terms are scanned at compile-time.
 Use the custom annotation @ContextGlossary to scan for terms to include in your glossary.
@@ -528,7 +562,7 @@ public class InvoiceEntity {
 }
 ```
 
-##### Actors
+#### Actors
 
 The actors are scanned at compile-time.
 Use the custom annotation @ContextActor to indicate that a certain actor uses the component.
@@ -557,9 +591,9 @@ public class DataAnalysisApplication {
 ```
 
 
-#### Typescript
+### Typescript
 
-##### Properties
+#### Properties
 The properties are scanned at compile-time.
 The overview of a component contains the following details:
 
@@ -581,7 +615,7 @@ The overview of a component contains the following details:
   its value can be `MICROSERVICE`, `MICROFRONTEND`, `GATEWAY` or `LIBRARY`
   if not available then it falls back to the default value `MICROFRONTEND`
 
-##### Subscribed REST API
+#### Subscribed REST API
 The subscribed REST API is scanned at compile-time.
 The synchronous links between components in contextmap are based on the subscribed REST APIs.
 Use the custom decorator @ContextClient to identify a dependency to another component.
@@ -596,7 +630,7 @@ export class GatewayHttpService {
 ```
 
 
-##### Decision records
+#### Decision records
 
 Decision records and other markdown files are scanned at compile-time.
 This is done by looking at the source folder and checking the file-extension.
@@ -608,7 +642,7 @@ the next time it is scanned it will be updated.
 Note that [Mermaid](https://mermaid-js.github.io/mermaid/#/) diagrams can be included.
 
 
-##### Features
+#### Features
 
 Features are scanned at compile-time.
 This is done by looking at the source folder and checking the file-extension.
@@ -617,21 +651,21 @@ Each file with extension `.feature`, or `.story` will be included.
 Unmodified files will be ignored. If you modify a file which was previously scanned, then
 the next time it is scanned it will be updated.
 
-##### Releases
+#### Releases
 
 Releases are scanned at compile-time.
 All local tags in Git will be included. The commits associated with each tag are also included.
 Only the date and the message of a commit is tracked.
 Other information (such as the person who made the commit) is not tracked.
 
-##### Recent Commits
+#### Recent Commits
 
 Recent commits are scanned at compile-time.
 All commits in Git from the last 90 days will be included.
 Only the date and the message of a commit is tracked.
 Other information (such as the person who made the commit) is not tracked.
 
-##### Glossary
+#### Glossary
 
 The glossary terms are scanned at compile-time.
 Use the custom decorator @ContextGlossary to scan for terms to include in your glossary.
@@ -658,14 +692,23 @@ export class InvoiceEntity {
 }
 ```
 
-##### Actors
+#### Actors
 The actors are scanned at compile-time.
-Use the custom decorator @ContextActor to indicate that a certain actor uses the component.
+Use the custom decorator @ContextActor/@ContextActors to indicate that a certain actor uses the component.
 
 For example:
 
 ```typescript
 @ContextActor('Customer')
+export class AppComponent {
+
+}
+```
+
+Or in case there are multiple actors:
+
+```typescript
+@ContextActors(['Customer', 'Support'])
 export class AppComponent {
 
 }
