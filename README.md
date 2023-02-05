@@ -28,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.19.0</version>
+      <version>1.20.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -52,7 +52,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.19.0</version>
+      <version>1.20.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -72,7 +72,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.19.0</version>
+    <version>1.20.0</version>
   </dependency>
 </dependencies>
 ```
@@ -112,7 +112,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.19.0</version>
+    <version>1.20.0</version>
   </dependency>
 </dependencies>
 ```
@@ -193,21 +193,21 @@ The properties are scanned at compile-time.
 The overview of a component contains the following details:
 
 - **System name** is based on the property contextmap.scan.system-name in your .properties file or .yml file,
-  if not available then it falls back to the <groupId /> in the pom.xml
+  if not available then it falls back to the groupId in the pom.xml
 - **Component name** is based on the property spring.application.name in your .properties file or .yml file,
-  if not available then it falls back to the <name /> in the pom.xml
-- **Domain vision statement** is based on the <description /> in the pom.xml
-- **Technology** is based on the <dependencies /> in the pom.xml
-- **Team** is based on the name of the first <developer /> in the pom.xml
-- **Team's organization** is based on the organization of the first <developer /> in the pom.xml
-- **Team's email** is based on the email of the first <developer /> in the pom.xml
+  if not available then it falls back to the name in the pom.xml
+- **Domain vision statement** is based on the description in the pom.xml
+- **Technology** is based on the dependencies in the pom.xml
+- **Team** is based on the name of the first developer in the pom.xml
+- **Team's organization** is based on the organization of the first developer in the pom.xml
+- **Team's email** is based on the email of the first developer in the pom.xml
 - **Bytes of code** is determined by scanning the files in your source folder, counting the filesizes
 - **Languages** are determined by scanning the files in your source folder, and looking at the filenames
-- **Version** is based on the <version /> in the pom.xml
-- **Url issue management** is based on the url from <issueManagement><url /></issueManagement> in the pom.xml
-- **Url source code** is based on the url from <scm><url /></scm> in the pom.xml
-- **Url for external documentation** is based on the <url /> in the pom.xml
-- **Url buid pipeline** is based on the url from <ciManagement><url /></ciManagement> in the pom.xml
+- **Version** is based on the version in the pom.xml
+- **Url issue management** is based on the url from issueManagement's url in the pom.xml
+- **Url source code** is based on the url from scm's url in the pom.xml
+- **Url for external documentation** is based on the url in the pom.xml
+- **Url buid pipeline** is based on the url from ciManagement's url in the pom.xml
 - **Component type** is based on the property contextmap.scan.component-type in your .properties file or .yml file,
   its value can be `MICROSERVICE`, `MICROFRONTEND`, `GATEWAY` or `LIBRARY` 
   if not available then it falls back to the default value `MICROSERVICE`
@@ -380,6 +380,7 @@ Contextmap currently supports scanning events for the following message brokers
 - RabbitMQ
 - ActiveMQ (JMS)
 - Kafka
+- Azure EventHub
 
 
 ##### RabbitMQ
@@ -411,9 +412,20 @@ Topics on which the scanned component publishes messages are scanned by finding 
 - NewTopic (org.apache.kafka.clients.admin.NewTopic)
 - KafkaTemplate (org.springframework.kafka.core.KafkaTemplate)
 
-Topcis on which a component subscribes are scanned by finding Spring beans annotated by
+Topics on which a component subscribes are scanned by finding Spring beans annotated by
 KafkaListener (org.springframework.kafka.annotation.KafkaListener)
 
+##### Azure EventHub
+
+EventHubs on which the scanned component publishes messages are scanned by finding Spring beans of type
+
+- EventHubProducerClient (com.azure.messaging.eventhubs.EventHubProducerClient)
+- EventHubProducerAsyncClient (com.azure.messaging.eventhubs.EventHubProducerAsyncClient)
+
+EventHubs on which a component subscribes are scanned by finding Spring beans of type
+
+- EventHubConsumerClient (com.azure.messaging.eventhubs.EventHubConsumerClient)
+- EventHubConsumerAsyncClient (com.azure.messaging.eventhubs.EventHubConsumerAsyncClient)
 
 ##### Event Payload
 
