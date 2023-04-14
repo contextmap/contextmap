@@ -28,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.21.0</version>
+      <version>1.22.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -52,7 +52,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.21.0</version>
+      <version>1.22.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -72,7 +72,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.21.0</version>
+    <version>1.22.0</version>
   </dependency>
 </dependencies>
 ```
@@ -112,7 +112,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.21.0</version>
+    <version>1.22.0</version>
   </dependency>
 </dependencies>
 ```
@@ -144,7 +144,7 @@ The command to run the compile-time scan is "`npm run contextmap:scan`".
   "contextmap:scan": "node node_modules/@contextmap/typescript-compiletime/cli.js"
 },
 "devDependencies": {
-  "@contextmap/typescript-compiletime": "^1.2.0",
+  "@contextmap/typescript-compiletime": "^1.3.0",
 },
 "contextmap": {
   "key": "PLACE_KEY_HERE"
@@ -385,7 +385,7 @@ Contextmap currently supports scanning events for the following message brokers
 - ActiveMQ (JMS)
 - Kafka
 - Azure EventHub
-
+- Azure ServiceBus
 
 ##### RabbitMQ
 
@@ -398,6 +398,8 @@ Also logback AMQP appenders are scanned and identified as exchanges.
 
 Queues on which a component subscribes are scanned by finding Spring beans of type
 Binding (org.springframework.amqp.core.Binding)
+
+When using Spring Cloud Stream then producers and consumers are scanned.
 
 ##### ActiveMQ (JMS)
 
@@ -418,6 +420,9 @@ Topics on which the scanned component publishes messages are scanned by finding 
 
 Topics on which a component subscribes are scanned by finding Spring beans annotated by
 KafkaListener (org.springframework.kafka.annotation.KafkaListener)
+
+##### Azure ServiceBus
+When using Spring Cloud Stream then producers and consumers are scanned.
 
 ##### Azure EventHub
 
@@ -578,6 +583,36 @@ public class InvoiceEntity {
 }
 ```
 
+#### Tech Radar
+The tech radar entries are scanned at compile-time.
+You typically will want to manage this from a single "architecture governance" project, instead of having contributions from multiple components.
+This architecture governance project would require only a single file, namely the pom.xml
+
+To define the tech radar entries, add the following configuration to the plugin inside the pom.xml
+
+```xml
+<plugin>
+  <groupId>io.contextmap</groupId>
+  <artifactId>java-spring-compiletime</artifactId>
+  <version>1.22.0</version>
+  <configuration>
+    <key>PLACE_KEY_HERE</key>
+    <techRadar>
+      <entries>
+        <entry>
+          <label>Name of the entry, e.g. GitHub Actions</label>
+          <link>Link to external website (optional), e.g. https://www.github.com</link>
+          <description>A description of the entry (optional)</description>
+          <quadrant>Either: TOOLS, TECHNIQUES, FRAMEWORKS, LANGUAGES (optional, default is TOOLS)</quadrant>
+          <ring>Either: ADOPT, TRIAL, ASSESS, HOLD (optional, default is HOLD)</ring>
+          <movement>Either: NONE, UP, DOWN (optional, default is NONE)</movement>
+        </entry>
+      </entries>
+    </techRadar>
+  </configuration>
+</plugin>
+```
+
 #### Actors
 
 The actors are scanned at compile-time.
@@ -630,6 +665,10 @@ The overview of a component contains the following details:
 - **Component type** is based on the property contextmap.scan.componentType from the package.json file,
   its value can be `MICROSERVICE`, `MICROFRONTEND`, `GATEWAY` or `LIBRARY`
   if not available then it falls back to the default value `MICROFRONTEND`
+
+If you want to extend the overview and include custom information, then add a property
+`contextmap.scan.overviewDecisionRecord` to the package.json file, with the filename of the markdown file
+which needs to be included.
 
 #### Subscribed REST API
 The subscribed REST API is scanned at compile-time.
