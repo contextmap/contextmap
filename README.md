@@ -28,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.22.0</version>
+      <version>2.0.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -52,7 +52,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>1.22.0</version>
+      <version>2.0.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -72,7 +72,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>1.22.0</version>
+    <version>2.0.0</version>
   </dependency>
 </dependencies>
 ```
@@ -112,7 +112,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>1.22.0</version>
+    <version>2.0.0</version>
   </dependency>
 </dependencies>
 ```
@@ -421,6 +421,8 @@ Topics on which the scanned component publishes messages are scanned by finding 
 Topics on which a component subscribes are scanned by finding Spring beans annotated by
 KafkaListener (org.springframework.kafka.annotation.KafkaListener)
 
+When using Spring Cloud Stream then producers and consumers are scanned.
+
 ##### Azure ServiceBus
 When using Spring Cloud Stream then producers and consumers are scanned.
 
@@ -443,26 +445,36 @@ Use the custom annotation `@ContextEvent` to allow contextmap to identify the pa
 For example:
 
 ```java
-// For RabbitMQ you can refer to the name of an Exchange or RabbitTemplate registered as Spring Bean
+// For RabbitMQ you can refer to the name of an Exchange or RabbitTemplate registered as Spring Bean,
+// or use SpEL to refer to a property, or directly use the name of the exchange
 @ContextEvent(publishedBy = "orderCreatedExchange")
 public class OrderCreated {
 
 }
 
-// For ActiveMQ you can refer to the name of a Queue or Topic registered as Spring Bean
+// For ActiveMQ you can refer to the name of a Queue or Topic registered as Spring Bean,
+// or use SpEL to refer to a property, or directly use the name of the topic/queue
 @ContextEvent(publishedBy = "orderCreatedTopic")
 public class OrderCreated {
 
 }
 
-// For Kafka you can refer to the name of a Topic or KafkaTemplate registered as Spring Bean
+// For Kafka you can refer to the name of a Topic or KafkaTemplate registered as Spring Bean,
+// or use SpEL to refer to a property, or directly use the name of the topic
+// Note: when using Kafka Cloud Stream you can only use a SpEL expression or directly use the name of the topic
 @ContextEvent(publishedBy = "orderCreatedTopic")
 public class OrderCreated {
 
 }
 
-// Or you could refer to a configuration property for the target name on which is published
+// Example of referring to a configuration property (e.g. when using Spring Cloud Stream)
 @ContextEvent(publishedBy = "${order-created.exchange}")
+public class OrderCreated {
+
+}
+
+// Example of referring to the actual name (e.g. when using Spring Cloud Stream)
+@ContextEvent(publishedBy = "order-created")
 public class OrderCreated {
 
 }
@@ -594,7 +606,7 @@ To define the tech radar entries, add the following configuration to the plugin 
 <plugin>
   <groupId>io.contextmap</groupId>
   <artifactId>java-spring-compiletime</artifactId>
-  <version>1.22.0</version>
+  <version>2.0.0</version>
   <configuration>
     <key>PLACE_KEY_HERE</key>
     <techRadar>
