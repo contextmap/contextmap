@@ -144,7 +144,7 @@ The command to run the compile-time scan is "`npm run contextmap:scan`".
   "contextmap:scan": "node node_modules/@contextmap/typescript-compiletime/cli.js"
 },
 "devDependencies": {
-  "@contextmap/typescript-compiletime": "^1.3.0",
+  "@contextmap/typescript-compiletime": "^1.4.0",
 },
 "contextmap": {
   "key": "PLACE_KEY_HERE"
@@ -756,6 +756,32 @@ You can also document any aliases which could be used for the same term.
 })
 export class InvoiceEntity {
 
+}
+```
+
+
+#### Tech Radar
+The tech radar entries are scanned at compile-time.
+You typically will want to manage this from a single "architecture governance" project, instead of having contributions from multiple components.
+This architecture governance project would require only a single file, namely the package.json
+
+To define the tech radar entries, add the following configuration to the contextmap section inside the package.json
+
+```json
+"contextmap": {
+  "key": "PLACE_KEY_HERE",
+  "techRadar": {
+    "entries": [
+        {
+          "label": "Name of the entry, e.g. GitHub Actions",
+          "link": "Link to external website (optional), e.g. https://www.github.com</link>",
+          "description": "A description of the entry (optional)",
+          "quadrant": "Either: TOOLS, TECHNIQUES, FRAMEWORKS, LANGUAGES (optional, default is TOOLS)",
+          "ring": "Either: ADOPT, TRIAL, ASSESS, HOLD (optional, default is HOLD)",
+          "movement": "Either: NONE, UP, DOWN (optional, default is NONE)"
+        }
+    ]
+  }
 }
 ```
 
