@@ -28,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>2.0.0</version>
+      <version>2.1.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -52,7 +52,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>2.0.0</version>
+      <version>2.1.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -72,7 +72,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
   </dependency>
 </dependencies>
 ```
@@ -112,7 +112,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
   </dependency>
 </dependencies>
 ```
@@ -606,7 +606,7 @@ To define the tech radar entries, add the following configuration to the plugin 
 <plugin>
   <groupId>io.contextmap</groupId>
   <artifactId>java-spring-compiletime</artifactId>
-  <version>2.0.0</version>
+  <version>2.1.0</version>
   <configuration>
     <key>PLACE_KEY_HERE</key>
     <techRadar>
@@ -653,6 +653,23 @@ public class DataAnalysisApplication {
 }
 ```
 
+#### Exemplary Code
+
+Documenting exemplary code happens at compile time.
+Use the custom annotation @ContextExemplar to indicate that a certain file or class should be considered the starting point of the exemplary code.
+
+For example:
+
+```java
+@ContextExemplar(
+  title = "Oracle & RabbitMQ Testcontainer",
+  description = "This integration test uses two testcontainers (RabbitMQ and Oracle) to simulate the production environment perfectly.",
+  tags = { "testcontainer", "oracle", "rabbitmq" }
+)
+public class OrderPlacementContainerTest {
+
+}
+```
 
 ### Typescript
 
