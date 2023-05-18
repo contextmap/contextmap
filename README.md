@@ -144,7 +144,7 @@ The command to run the compile-time scan is "`npm run contextmap:scan`".
   "contextmap:scan": "node node_modules/@contextmap/typescript-compiletime/cli.js"
 },
 "devDependencies": {
-  "@contextmap/typescript-compiletime": "^1.4.0",
+  "@contextmap/typescript-compiletime": "^1.5.0",
 },
 "contextmap": {
   "key": "PLACE_KEY_HERE"
@@ -165,7 +165,7 @@ To do so, add the following dependency to your package.json file.
 
 ```json
 "dependencies": {
-  "@contextmap/typescript-decorators": "^1.0.0"
+  "@contextmap/typescript-decorators": "^1.1.0"
 }
 ```
 
@@ -820,6 +820,24 @@ Or in case there are multiple actors:
 ```typescript
 @ContextActors(['Customer', 'Support'])
 export class AppComponent {
+
+}
+```
+
+#### Exemplary Code
+
+Documenting exemplary code happens at compile time.
+Use the custom decorator @ContextExemplar to indicate that a certain class should be considered the starting point of the exemplary code.
+
+For example:
+
+```typescript
+@ContextExemplar({
+    title = 'NgRx Action Hygiene',
+    description = 'Example of good NgRx action hygiene in combination with lazy loaded modules',
+    tags = {'ngrx'}
+})
+export class OrderActions {
 
 }
 ```
