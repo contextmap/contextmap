@@ -28,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>2.1.0</version>
+      <version>2.1.6</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -52,7 +52,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>2.1.0</version>
+      <version>2.1.6</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -72,7 +72,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.6</version>
   </dependency>
 </dependencies>
 ```
@@ -112,7 +112,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.6</version>
   </dependency>
 </dependencies>
 ```
@@ -144,7 +144,7 @@ The command to run the compile-time scan is "`npm run contextmap:scan`".
   "contextmap:scan": "node node_modules/@contextmap/typescript-compiletime/cli.js"
 },
 "devDependencies": {
-  "@contextmap/typescript-compiletime": "^1.5.0",
+  "@contextmap/typescript-compiletime": "^1.7.0",
 },
 "contextmap": {
   "key": "PLACE_KEY_HERE"
@@ -193,9 +193,14 @@ The properties are scanned at compile-time.
 The overview of a component contains the following details:
 
 - **System name** is based on the property `contextmap.scan.system-name` in your .properties file or .yml file,
-  if not available then it falls back to the groupId in the pom.xml
-- **Component name** is based on the property `spring.application.name` in your .properties file or .yml file,
-  if not available then it falls back to the name in the pom.xml
+  if that's not available then it falls back to the property `systemName` from the compile-time plugin's configuration in the pom.xml file,
+  if that's not available then it falls back to the groupId in the pom.xml
+- **Component name** is based on the property `contextmap.scan.component-name` in your .properties file or .yml file, 
+  if that's not available then it falls back to the property `spring.application.name` in your .properties file or .yml file,
+  if that's not available then it falls back to the name in the pom.xml
+- **Component aliases** are based on the property `contextmap.scan.component-aliases` in your .properties file or .yml file.
+  This is a comma-separated list of aliases used for the component. You can use this for example when you have an old name and new name for the same component,
+  or when you have a human-readable name and technical name used during service discovery. (you don't need to include the component's name in the list of aliases)
 - **Domain vision statement** is based on the description in the pom.xml
 - **Technology** is based on the dependencies in the pom.xml
 - **Team** is based on the name of the first developer in the pom.xml
@@ -331,18 +336,31 @@ Methods can be documented by any of the following annotations. This way a descri
 - Custom annotation @ContextRestEndpoint (io.contextmap.annotations.rest.ContextRestEndpoint)
 
 
-Properties of a requestbody or responsebody can be documented by any of the following annotations. 
+A requestbody or responsebody can be documented by any of the following annotations. 
 
-- Swagger's @Schema (io.swagger.v3.oas.annotations.media.Schema)
-- Swagger's @ApiModelProperty (io.swagger.annotations.ApiModelProperty)
-- Custom annotation @ContextApiProperty (io.contextmap.annotations.ContextApiProperty)
+- Swagger's @Schema (io.swagger.v3.oas.annotations.media.Schema) for type and properties documentation
+- Swagger's @ApiModelProperty (io.swagger.annotations.ApiModelProperty) for properties documentation
+- Swagger's @ApiModel (io.swagger.annotations.ApiModel) for type documentation
+- Custom annotation @ContextApiProperty (io.contextmap.annotations.ContextApiProperty) for properties documentation
+- Custom annotation @ContextApi (io.contextmap.annotations.ContextApi) for type documentation
 
 For example:
 
 ```java
+// Using custom annotations
+@ContextApi(description = "A confirmed order")
 public class OrderDto {
     
   @ContextApiProperty(description = "This datetime is in ISO-8601", example = "2021-12-31")
+  private LocalDateTime createdOn;
+
+}
+
+// Using Swagger annotation
+@Schema(description = "A confirmed order")
+public class OrderDto {
+    
+  @Schema(description = "This datetime is in ISO-8601", example = "2021-12-31")
   private LocalDateTime createdOn;
 
 }
@@ -367,7 +385,7 @@ identify the component.
 - @FeignClient (org.springframework.cloud.netflix.feign.FeignClient)
 - @LoadBalancerClient (org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient)
 - @LoadBalancerClients (org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients)
-- @ContextClient (io.contextmap.annotations.client.ContextClient)
+- @ContextClient (io.contextmap.annotations.client.ContextClient), can be used on class level and method level
 
 > The custom annotation @ContextClient can be used to model any dependency, not just REST.
 
@@ -442,14 +460,21 @@ EventHubs on which a component subscribes are scanned by finding Spring beans of
 
 Use the custom annotation `@ContextEvent` to allow contextmap to identify the payload
 (or potentially multiple payloads) of an event which is published.
+
+Any annotation used to document a REST requestbody or responsebody, can also be used to document the payload of an event.
+
 For example:
 
 ```java
 // For RabbitMQ you can refer to the name of an Exchange or RabbitTemplate registered as Spring Bean,
 // or use SpEL to refer to a property, or directly use the name of the exchange
+// (Note: only reference a RabbitTemplate Spring Bean, when it's default exchange is configured)
 @ContextEvent(publishedBy = "orderCreatedExchange")
 public class OrderCreated {
-
+    
+  @ContextApiProperty(description = "This datetime is in ISO-8601", example = "2021-12-31")
+  private LocalDateTime createdOn;
+  
 }
 
 // For ActiveMQ you can refer to the name of a Queue or Topic registered as Spring Bean,
@@ -479,8 +504,6 @@ public class OrderCreated {
 
 }
 ```
-
-Any annotation used to document a REST requestbody or responsebody, can also be used to document the payload of an event.
 
 #### Storages
 
@@ -606,7 +629,7 @@ To define the tech radar entries, add the following configuration to the plugin 
 <plugin>
   <groupId>io.contextmap</groupId>
   <artifactId>java-spring-compiletime</artifactId>
-  <version>2.1.0</version>
+  <version>2.1.6</version>
   <configuration>
     <key>PLACE_KEY_HERE</key>
     <techRadar>
@@ -677,13 +700,16 @@ public class OrderPlacementContainerTest {
 The properties are scanned at compile-time.
 The overview of a component contains the following details:
 
-- **System name** is based on the property contextmap.scan.systemName from the package.json file
-- **Component name** is based on the property name from the package.json file
-- **Domain vision statement** is based on the description from the package.json file
-- **Technology** is based on the dependencies from the package.json file
-- **Team** is based on the property author.name from the package.json file
-- **Team's organization** is based on the property contextmap.scan.organization from the package.json file
-- **Team's email** is based on the property author.email from the package.json file
+- **System name** is based on the property `contextmap.scan.systemName` from the package.json file, or you can override this by passing it as argument `systemName`
+- **Component name** is based on the property `name` from the package.json file, or you can override this by passing it as argument `componentName`
+- **Component aliases** are based on the property `contextmap.scan.aliases` from the package.json file.
+  This is an array of aliases used for the component. You can use this for example when you have an old name and new name for the same component,
+  or when you have a human-readable name and technical name. (you don't need to include the component's name in the list of aliases)
+- **Domain vision statement** is based on the `description` from the package.json file
+- **Technology** is based on the `dependencies` from the package.json file
+- **Team** is based on the property `author.name` from the package.json file
+- **Team's organization** is based on the property `contextmap.scan.organization` from the package.json file
+- **Team's email** is based on the property `author.email` from the package.json file
 - **Bytes of code** is determined by scanning the source files, counting the filesizes
 - **Languages** are determined by scanning the source files, and looking at the filenames
 - **Version** is based on the version from the package.json file
@@ -691,7 +717,7 @@ The overview of a component contains the following details:
 - **Url source code** COMING SOON
 - **Url for external documentation** COMING SOON
 - **Url build pipeline** COMING SOON
-- **Component type** is based on the property contextmap.scan.componentType from the package.json file,
+- **Component type** is based on the property `contextmap.scan.componentType` from the package.json file,
   its value can be `MICROSERVICE`, `MICROFRONTEND`, `GATEWAY` or `LIBRARY`
   if not available then it falls back to the default value `MICROFRONTEND`
 
