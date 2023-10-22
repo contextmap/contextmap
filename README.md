@@ -28,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>2.1.6</version>
+      <version>2.3.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -52,7 +52,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>2.1.6</version>
+      <version>2.3.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -72,7 +72,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>2.1.6</version>
+    <version>2.3.0</version>
   </dependency>
 </dependencies>
 ```
@@ -112,7 +112,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>2.1.6</version>
+    <version>2.3.0</version>
   </dependency>
 </dependencies>
 ```
@@ -391,7 +391,30 @@ identify the component.
 
 When using Spring Cloud Gateway, the configuration files are scanned to find routes.
 Any configured route which has a load balanced uri-property (i.e. starting with "lb://") will be identified
-as a link to another component.
+as a link to another component.  
+
+For example:
+
+```java
+// Example using feign.
+@FeignClient(name = "order-service")
+public interface OrderClient {
+    
+  @GetMapping("/orders")
+  List<Order> getOrders();
+
+}
+
+// Example using http exchange. This requires the use of custom annotation ContextClient to detect the interface.
+// This is an example using the reactive stack, but the servlet stack is also supported.
+@ContextClient(name = "order-service")
+public interface OrderClient {
+    
+    @GetExchange("/orders")
+    Flux<Order> getOrders();
+
+}
+```
 
 #### Events
 
@@ -629,7 +652,7 @@ To define the tech radar entries, add the following configuration to the plugin 
 <plugin>
   <groupId>io.contextmap</groupId>
   <artifactId>java-spring-compiletime</artifactId>
-  <version>2.1.6</version>
+  <version>2.3.0</version>
   <configuration>
     <key>PLACE_KEY_HERE</key>
     <techRadar>
