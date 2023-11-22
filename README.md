@@ -28,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>2.3.0</version>
+      <version>2.5.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -52,7 +52,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>2.3.0</version>
+      <version>2.5.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -72,7 +72,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>2.3.0</version>
+    <version>2.5.0</version>
   </dependency>
 </dependencies>
 ```
@@ -112,7 +112,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>2.3.0</version>
+    <version>2.5.0</version>
   </dependency>
 </dependencies>
 ```
@@ -144,7 +144,7 @@ The command to run the compile-time scan is "`npm run contextmap:scan`".
   "contextmap:scan": "node node_modules/@contextmap/typescript-compiletime/cli.js"
 },
 "devDependencies": {
-  "@contextmap/typescript-compiletime": "^1.7.0",
+  "@contextmap/typescript-compiletime": "^1.8.0",
 },
 "contextmap": {
   "key": "PLACE_KEY_HERE"
@@ -165,7 +165,7 @@ To do so, add the following dependency to your package.json file.
 
 ```json
 "dependencies": {
-  "@contextmap/typescript-decorators": "^1.1.0"
+  "@contextmap/typescript-decorators": "^1.2.0"
 }
 ```
 
@@ -562,6 +562,9 @@ public class TrainingSetData {
 }
 ```
 
+For JDBC databases the tables and views are documented. For MongoDB the collections are documented, and schema analysis
+is done based on the first 100 documents in a collection.  
+
 #### Decision records
 
 Decision records and other markdown files are scanned at compile-time.
@@ -652,7 +655,7 @@ To define the tech radar entries, add the following configuration to the plugin 
 <plugin>
   <groupId>io.contextmap</groupId>
   <artifactId>java-spring-compiletime</artifactId>
-  <version>2.3.0</version>
+  <version>2.5.0</version>
   <configuration>
     <key>PLACE_KEY_HERE</key>
     <techRadar>
@@ -671,9 +674,61 @@ To define the tech radar entries, add the following configuration to the plugin 
 </plugin>
 ```
 
-#### Actors
+#### Capabilities
+The business capabilities of a component are scanned at compile-time.
+There are 3 ways to document capabilities:
+- using pom.xml
+- using properties (*.properties or *.yml)
+- using annotations
 
-The actors are scanned at compile-time.
+Example when using pom.xml:
+```xml
+ <plugin>
+  <groupId>io.contextmap</groupId>
+  <artifactId>java-spring-compiletime</artifactId>
+  <configuration>
+    ...
+    <capabilities>
+      <capability>Inventory management</capability>
+      <capability>Legal and compliance</capability>
+    </capabilities>
+    ...
+  </configuration>
+</plugin>
+```
+
+Example when using properties:
+```
+# Specify the capabilities as a comma-separated list
+# e.g. in application.properties
+contextmap.scan.capabilities=Inventory management, Legal and compliance
+
+# e.g. in application.yml
+contextmap:
+  scan:
+    capabilities: Inventory management, Legal and compliance
+```
+
+Example when using annotations:
+```java
+// When specifying a single capability you can use 
+@ContextCapability("Legal and compliance")
+public class ComplaintsApplication {
+
+}
+
+// Or when specifying multiple capabilities you can use 
+@ContextCapabilities({
+  @ContextCapability("Inventory management"),
+  @ContextCapability("Legal and compliance")
+})
+public class InventoryApplication {
+
+}
+```
+
+#### Actors
+The actors of a component are scanned at compile-time.
 Use the custom annotation @ContextActor to indicate that a certain actor uses the component.
 
 For example:
@@ -851,8 +906,41 @@ To define the tech radar entries, add the following configuration to the context
 }
 ```
 
+
+#### Capabilities
+The business capabilities of a component are scanned at compile-time.
+There are 2 ways to document capabilities:
+- using package.json
+- using decorators
+
+Example when using package.json:
+```json
+contextmap: {
+  scan: {
+    ...
+    capabilities: ["Inventory management", "Legal and compliance"],
+    ...
+  }
+}
+```
+
+Example when using decorators:
+```typescript
+// When specifying a single capability you can use 
+@ContextCapability("Legal and compliance")
+export class ComplaintsAppComponent {
+
+}
+
+// Or when specifying multiple capabilities you can use 
+@ContextCapabilities(["Inventory management", "Legal and compliance"])
+export class InventoryAppComponent {
+
+}
+```
+
 #### Actors
-The actors are scanned at compile-time.
+The actors of a component are scanned at compile-time.
 Use the custom decorator @ContextActor/@ContextActors to indicate that a certain actor uses the component.
 
 For example:
