@@ -28,7 +28,7 @@ Make sure to run this command with the root directory of your project as current
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>2.5.0</version>
+      <version>2.6.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
       </configuration>
@@ -52,7 +52,7 @@ The configuration will look like this:
     <plugin>
       <groupId>io.contextmap</groupId>
       <artifactId>java-spring-compiletime</artifactId>
-      <version>2.5.0</version>
+      <version>2.6.0</version>
       <configuration>
         <key>PLACE_KEY_HERE</key>
         <multiModuleComponentName>COMPONENT_NAME</multiModuleComponentName>
@@ -72,7 +72,7 @@ The runtime scan will only happen once at startup of your project.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-spring-runtime</artifactId>
-    <version>2.5.0</version>
+    <version>2.6.0</version>
   </dependency>
 </dependencies>
 ```
@@ -112,7 +112,7 @@ To do so, add the following dependency to your pom.xml file.
   <dependency>
     <groupId>io.contextmap</groupId>
     <artifactId>java-annotations</artifactId>
-    <version>2.5.0</version>
+    <version>2.6.0</version>
   </dependency>
 </dependencies>
 ```
@@ -127,6 +127,36 @@ This allows you to see deployments in the releases overview of your components.
 
 To achieve this, add the following command to your deployment workflow "`mvn contextmap:deployment -Dversion=VERSION -Denvironment=ENVIRONMENT`".
 The version and environment parameters are to be filled in by your workflow.
+
+#### Community Edition
+
+One additional configuration setting is required when using the Community Edition, namely the host running the container.  
+This should be the same backend url as the environment variable configured on the Docker container.
+
+Add the following host-property to the compile-time configuration.
+```xml
+<build>
+  <plugins>
+    <plugin>
+      <groupId>io.contextmap</groupId>
+      <artifactId>java-spring-compiletime</artifactId>
+      <version>2.6.0</version>
+      <configuration>
+        ...
+        <host>BACKEND_URL</host>
+        ...
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+```
+
+Add the following host-property for the runtime configuration.
+```ini
+contextmap.host=BACKEND_URL
+```
+
+> ✔️ Note you can use automatic property expansion to inject Maven properties as Spring properties.
 
 
 ### Typescript
@@ -144,7 +174,7 @@ The command to run the compile-time scan is "`npm run contextmap:scan`".
   "contextmap:scan": "node node_modules/@contextmap/typescript-compiletime/cli.js"
 },
 "devDependencies": {
-  "@contextmap/typescript-compiletime": "^1.8.0",
+  "@contextmap/typescript-compiletime": "^1.9.0",
 },
 "contextmap": {
   "key": "PLACE_KEY_HERE"
@@ -183,6 +213,23 @@ The version and environment parameters are to be filled in by your workflow.
 }
 ```
 
+#### Community Edition
+
+One additional configuration setting is required when using the Community Edition, namely the host running the container.  
+This should be the same backend url as the environment variable configured on the Docker container. 
+
+Either the following host-property should be added to the `package.json` file.
+```json
+"contextmap": {
+  ...
+  "host": "BACKEND_URL",
+  ...
+}
+```
+
+Or you can also pass the property as parameter using `npm run contextmap:your-command -- --host=BACKEND_URL`.
+
+
 ## What is documented
 
 ### Java with Spring
@@ -194,7 +241,7 @@ The overview of a component contains the following details:
 
 - **System name** is based on the property `contextmap.scan.system-name` in your .properties file or .yml file,
   if that's not available then it falls back to the property `systemName` from the compile-time plugin's configuration in the pom.xml file,
-  if that's not available then it falls back to the groupId in the pom.xml
+  if that's not available then it falls back to a default value i.e. "Other"
 - **Component name** is based on the property `contextmap.scan.component-name` in your .properties file or .yml file, 
   if that's not available then it falls back to the property `spring.application.name` in your .properties file or .yml file,
   if that's not available then it falls back to the name in the pom.xml
@@ -210,7 +257,7 @@ The overview of a component contains the following details:
 - **Languages** are determined by scanning the files in your source folder, and looking at the filenames
 - **Version** is based on the version in the pom.xml
 - **Url issue management** is based on the url from issueManagement's url in the pom.xml
-- **Url source code** is based on the url from scm's url in the pom.xml
+- **Url source code** is based on the remote origin from git
 - **Url for external documentation** is based on the url in the pom.xml
 - **Url buid pipeline** is based on the url from ciManagement's url in the pom.xml
 - **Component type** is based on the property `contextmap.scan.component-type` in your .properties file or .yml file,
@@ -655,7 +702,7 @@ To define the tech radar entries, add the following configuration to the plugin 
 <plugin>
   <groupId>io.contextmap</groupId>
   <artifactId>java-spring-compiletime</artifactId>
-  <version>2.5.0</version>
+  <version>2.6.0</version>
   <configuration>
     <key>PLACE_KEY_HERE</key>
     <techRadar>
@@ -778,7 +825,7 @@ public class OrderPlacementContainerTest {
 The properties are scanned at compile-time.
 The overview of a component contains the following details:
 
-- **System name** is based on the property `contextmap.scan.systemName` from the package.json file, or you can override this by passing it as argument `systemName`
+- **System name** is based on the property `contextmap.scan.systemName` from the package.json file, or you can override this by passing it as argument `systemName`, if neither are defined then it falls back to a default value i.e. "Other"
 - **Component name** is based on the property `name` from the package.json file, or you can override this by passing it as argument `componentName`
 - **Component aliases** are based on the property `contextmap.scan.aliases` from the package.json file.
   This is an array of aliases used for the component. You can use this for example when you have an old name and new name for the same component,
@@ -791,10 +838,9 @@ The overview of a component contains the following details:
 - **Bytes of code** is determined by scanning the source files, counting the filesizes
 - **Languages** are determined by scanning the source files, and looking at the filenames
 - **Version** is based on the version from the package.json file
-- **Url issue management** COMING SOON
-- **Url source code** COMING SOON
-- **Url for external documentation** COMING SOON
-- **Url build pipeline** COMING SOON
+- **Url issue management** is based on the bugs url from the package.json file
+- **Url source code** is based on the repository url from the package.json file
+- **Url for external documentation** is based on the homepage from the package.json file
 - **Component type** is based on the property `contextmap.scan.componentType` from the package.json file,
   its value can be `MICROSERVICE`, `MICROFRONTEND`, `GATEWAY` or `LIBRARY`
   if not available then it falls back to the default value `MICROFRONTEND`
